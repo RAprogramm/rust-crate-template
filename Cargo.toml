@@ -1,6 +1,39 @@
+# SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
 [package]
-name = "rust-crate-template"
+name = "{{crate_name}}"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.92"
+authors = ["Your Name <your@email.com>"]
+description = "A short description of the crate"
+documentation = "https://docs.rs/{{crate_name}}"
+readme = "README.md"
+homepage = "https://github.com/{{github_username}}/{{crate_name}}"
+repository = "https://github.com/{{github_username}}/{{crate_name}}"
+license = "MIT"
+keywords = ["keyword1", "keyword2"]
+categories = ["development-tools"]
+include = ["src/**/*", "Cargo.toml", "LICENSE", "README.md", "CHANGELOG.md"]
+
+[lib]
+name = "{{crate_name}}"
+path = "src/lib.rs"
 
 [dependencies]
+
+[dev-dependencies]
+
+[features]
+default = []
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }

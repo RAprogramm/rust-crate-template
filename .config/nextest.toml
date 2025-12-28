@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
+[profile.default]
+retries = 0
+fail-fast = true
+
+[profile.ci]
+retries = 2
+fail-fast = false
+junit.path = "junit.xml"
