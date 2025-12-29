@@ -62,7 +62,7 @@ jobs:
       - name: Build and test
         working-directory: /tmp/test-crate
         run: |
-          cargo check
-          cargo clippy -- -D warnings
-          cargo test
+          cargo +stable check --all-features --all-targets
+          cargo +stable clippy --all-features --all-targets -- -D warnings
+          cargo +stable test --all-features
           cargo +nightly fmt -- --check
