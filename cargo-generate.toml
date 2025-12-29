@@ -4,8 +4,10 @@
 
 [template]
 cargo_generate_version = ">=0.21.0"
-ignore = [".git", "template-test.yml"]
-exclude = [".github/workflows/template-test.yml"]
+ignore = [".git"]
+exclude = [
+    ".github/workflows/template-test.yml",
+]
 
 [placeholders.gh_username]
 type = "string"

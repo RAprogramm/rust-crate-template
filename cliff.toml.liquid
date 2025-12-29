@@ -19,9 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 """
 body = """
-{%- macro remote_url() -%}
-  https://github.com/{{ gh_username }}/{{ project_name }}
-{%- endmacro -%}
+{% raw %}{%- macro remote_url() -%}{% endraw %}
+  https://github.com/{{gh_username}}/{{project-name}}
+{% raw %}{%- endmacro -%}
 
 {% if version -%}
 ## [{{ version | trim_start_matches(pat="v") }}]({{ self::remote_url() }}/releases/tag/{{ version }}) — {{ timestamp | date(format="%Y-%m-%d") }}
@@ -53,7 +53,7 @@ body = """
 
 {% if version -%}
 **Full Changelog**: [`{{ previous.version }}...{{ version }}`]({{ self::remote_url() }}/compare/{{ previous.version }}...{{ version }})
-{% endif %}
+{% endif %}{% endraw %}
 """
 footer = """
 ---
@@ -67,7 +67,7 @@ conventional_commits = true
 filter_unconventional = true
 split_commits = false
 commit_preprocessors = [
-    { pattern = '\((\w+)\s?\#([0-9]+)\)', replace = "([#${2}](https://github.com/{{ gh_username }}/{{ project_name }}/issues/${2}))" },
+    { pattern = '\((\w+)\s?\#([0-9]+)\)', replace = "([#${2}](https://github.com/{{gh_username}}/{{project-name}}/issues/${2}))" },
 ]
 commit_parsers = [
     { message = "^feat", group = "Features" },
@@ -92,5 +92,5 @@ topo_order = false
 sort_commits = "newest"
 
 [remote.github]
-owner = "{{ gh_username }}"
-repo = "{{ project_name }}"
+owner = "{{gh_username}}"
+repo = "{{project-name}}"
