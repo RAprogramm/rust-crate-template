@@ -7,6 +7,8 @@ cargo_generate_version = ">=0.21.0"
 ignore = [".git"]
 exclude = [
     ".github/workflows/template-test.yml",
+    ".github/workflows/dependabot-automerge.yml",
+    ".github/dependabot.yml",
 ]
 
 [placeholders.gh_username]
