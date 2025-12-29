@@ -1,5 +1,6 @@
 <!--
-SPDX-FileCopyrightText: 2025 RA <contact@revaprogramm.com>
+SPDX-FileCopyrightText: 2025 {{author_name}} <{{author_email}}>
+
 SPDX-License-Identifier: MIT
 -->
 
@@ -55,7 +56,6 @@ cargo test
 |------|---------|
 | No `unwrap()` / `expect()` | Use `?` or `.ok_or()` |
 | No unnecessary `clone()` | Pass references |
-| `::` only in imports | `use foo::bar` ok, `foo::bar()` bad |
 | Doc comments on public items | `/// Description` |
 | Max line width | 99 chars |
 

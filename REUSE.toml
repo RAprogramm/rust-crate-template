@@ -1,10 +1,17 @@
 version = 1
-SPDX-PackageName = "{{crate_name}}"
-SPDX-PackageSupplier = "RAprogramm <andrey.rozanov.vl@gmail.com>"
-SPDX-PackageDownloadLocation = "https://github.com/{{github_username}}/{{crate_name}}"
+SPDX-PackageName = "{{project-name}}"
+SPDX-PackageSupplier = "{{author_name}} <{{author_email}}>"
+SPDX-PackageDownloadLocation = "https://github.com/{{gh_username}}/{{project-name}}"
 
 [[annotations]]
-path = ["README.md", ".gitignore", ".rustfmt.toml", "Cargo.lock", "Cargo.toml", "tests/**/*.stderr"]
+path = [
+    "README.md",
+    ".gitignore",
+    ".rustfmt.toml",
+    "Cargo.lock",
+    "Cargo.toml",
+    ".config/**",
+]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2025 RAprogramm <andrey.rozanov.vl@gmail.com>"
+SPDX-FileCopyrightText = "2025 {{author_name}} <{{author_email}}>"
 SPDX-License-Identifier = "MIT"

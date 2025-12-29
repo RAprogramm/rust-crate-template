@@ -1,78 +1,41 @@
-# SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+# SPDX-FileCopyrightText: 2025 {{author_name}} <{{author_email}}>
 #
 # SPDX-License-Identifier: MIT
 
 version: 2
 
 updates:
-  # Rust dependencies
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-      timezone: "Europe/Moscow"
     commit-message:
       prefix: "chore(deps)"
-      include: "scope"
     labels:
       - "dependencies"
-      - "rust"
-    reviewers:
-      - "RAprogramm"
     open-pull-requests-limit: 10
     groups:
-      # Group all minor and patch updates together
-      rust-dependencies:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-      # Separate group for proc-macro related crates
-      proc-macro:
-        patterns:
-          - "syn"
-          - "quote"
-          - "proc-macro2"
-          - "darling*"
-        update-types:
-          - "major"
-          - "minor"
-          - "patch"
-      # Development dependencies
-      dev-dependencies:
-        dependency-type: "development"
+      rust-minor:
         patterns:
           - "*"
         update-types:
           - "minor"
           - "patch"
 
-  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-      timezone: "Europe/Moscow"
     commit-message:
       prefix: "ci(deps)"
-      include: "scope"
     labels:
       - "dependencies"
       - "ci"
-    reviewers:
-      - "RAprogramm"
-    open-pull-requests-limit: 5
     groups:
-      # Group all actions together
-      github-actions:
+      actions:
         patterns:
           - "*"
-        update-types:
-          - "major"
-          - "minor"
-          - "patch"

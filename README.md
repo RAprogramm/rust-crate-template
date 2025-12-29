@@ -1,99 +1,78 @@
 <!--
-SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+SPDX-FileCopyrightText: 2025 {{author_name}} <{{author_email}}>
 
 SPDX-License-Identifier: MIT
 -->
 
-# Rust Crate Template
+<p align="center">
+  <h1 align="center">{{project-name}}</h1>
+  <p align="center">
+    <strong>{{description}}</strong>
+  </p>
+</p>
 
-A production-ready template for Rust crates with CI/CD, coverage, and automated releases.
+<p align="center">
+  <a href="https://crates.io/crates/{{project-name}}">
+    <img src="https://img.shields.io/crates/v/{{project-name}}.svg?style=for-the-badge" alt="Crates.io"/>
+  </a>
+  <a href="https://docs.rs/{{project-name}}">
+    <img src="https://img.shields.io/docsrs/{{project-name}}?style=for-the-badge" alt="Documentation"/>
+  </a>
+</p>
 
-## Features
+<p align="center">
+  <a href="https://github.com/{{gh_username}}/{{project-name}}/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/{{gh_username}}/{{project-name}}/ci.yml?style=for-the-badge" alt="CI Status"/>
+  </a>
+  <a href="https://codecov.io/gh/{{gh_username}}/{{project-name}}">
+    <img src="https://img.shields.io/codecov/c/github/{{gh_username}}/{{project-name}}?style=for-the-badge" alt="Coverage"/>
+  </a>
+</p>
 
-- Rust 2024 edition with MSRV 1.92
-- GitHub Actions CI/CD pipeline
-- Automated releases to crates.io
-- Code coverage with Codecov
-- Security auditing with cargo-deny
-- REUSE-compliant licensing
-- Dependabot auto-merge for minor/patch updates
-- git-cliff for changelog generation
+<p align="center">
+  <a href="https://github.com/{{gh_username}}/{{project-name}}/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" alt="License: MIT"/>
+  </a>
+  <a href="https://api.reuse.software/info/github.com/{{gh_username}}/{{project-name}}">
+    <img src="https://img.shields.io/reuse/compliance/github.com%2F{{gh_username}}%2F{{project-name}}?style=for-the-badge" alt="REUSE Compliant"/>
+  </a>
+</p>
+
+---
+
+## Installation
+
+Add to your `Cargo.toml`:
+
+```toml
+[dependencies]
+{{project-name}} = "0.1"
+```
 
 ## Quick Start
 
-1. Click "Use this template" on GitHub
-2. Clone your new repository
-3. Replace placeholders:
+```rust
+use {{crate_name}}::greet;
 
-```bash
-# Replace these in all files:
-# {{crate_name}} -> your-crate-name
-# {{github_username}} -> your-github-username
-
-find . -type f \( -name "*.toml" -o -name "*.yml" -o -name "*.md" -o -name "*.rs" \) \
-  -exec sed -i 's/{{crate_name}}/your-crate-name/g' {} \;
-
-find . -type f \( -name "*.toml" -o -name "*.yml" -o -name "*.md" -o -name "*.rs" \) \
-  -exec sed -i 's/{{github_username}}/your-github-username/g' {} \;
+fn main() {
+    println!("{}", greet("World"));
+}
 ```
 
-4. Update `Cargo.toml` with your details:
-   - `authors`
-   - `description`
-   - `keywords`
-   - `categories`
+## Features
 
-5. Set up secrets in GitHub repository settings:
-   - `CARGO_REGISTRY_TOKEN` - for crates.io publishing
-   - `CODECOV_TOKEN` - for coverage reports (optional)
+- Feature 1
+- Feature 2
+- Feature 3
 
-## Project Structure
+## Documentation
 
-```
-.
-├── .github/
-│   ├── workflows/
-│   │   ├── ci.yml              # Main CI/CD pipeline
-│   │   └── dependabot-automerge.yml
-│   └── dependabot.yml
-├── LICENSES/
-│   └── MIT.txt
-├── src/
-│   └── lib.rs
-├── Cargo.toml
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── LICENSE -> LICENSES/MIT.txt
-├── README.md
-├── REUSE.toml
-├── cliff.toml
-├── codecov.yml
-└── deny.toml
-```
+- [API Documentation](https://docs.rs/{{project-name}})
+- [Examples](https://github.com/{{gh_username}}/{{project-name}}/tree/main/examples)
 
-## CI Pipeline
+## Contributing
 
-| Stage | Jobs |
-|-------|------|
-| Checks | Format, Clippy, Docs, Security, REUSE |
-| Tests | Unit tests, Doc tests, Coverage |
-| Release | Changelog, Publish, GitHub Release |
-
-## Development
-
-```bash
-# Format code
-cargo +nightly fmt
-
-# Lint
-cargo clippy -- -D warnings
-
-# Test
-cargo test
-
-# Coverage
-cargo llvm-cov
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 

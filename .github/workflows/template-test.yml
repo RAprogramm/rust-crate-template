@@ -1,0 +1,68 @@
+# SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
+name: Template Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.toml"
+      - "**.rs"
+      - "**.yml"
+      - "**.md"
+  pull_request:
+    paths:
+      - "**.toml"
+      - "**.rs"
+      - "**.yml"
+      - "**.md"
+
+jobs:
+  generate:
+    name: Test cargo-generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-generate
+
+      - name: Generate project
+        run: |
+          cargo generate --path . \
+            --name test-crate \
+            --define gh_username=testuser \
+            --define author_name="Test Author" \
+            --define author_email="test@example.com" \
+            --define description="A test crate for CI" \
+            --destination /tmp
+
+      - name: Verify generated files
+        working-directory: /tmp/test-crate
+        run: |
+          echo "=== Cargo.toml ==="
+          cat Cargo.toml
+          grep -q 'name = "test-crate"' Cargo.toml
+          grep -q 'authors = \["Test Author <test@example.com>"\]' Cargo.toml
+          echo "=== README.md ==="
+          head -30 README.md
+          grep -q 'test-crate' README.md
+
+      - name: Build and test
+        working-directory: /tmp/test-crate
+        run: |
+          cargo check
+          cargo clippy -- -D warnings
+          cargo test
+          cargo +nightly fmt -- --check

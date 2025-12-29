@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+# SPDX-FileCopyrightText: 2025 {{author_name}} <{{author_email}}>
 #
 # SPDX-License-Identifier: MIT
 
@@ -20,14 +20,12 @@ on:
         default: false
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: {% raw %}${{ github.workflow }}-${{ github.ref }}{% endraw %}
+  cancel-in-progress: {% raw %}${{ github.event_name == 'pull_request' }}{% endraw %}
 
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
-  attestations: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -36,72 +34,53 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  # ════════════════════════════════════════════════════════════════════════════
-  # STAGE 1: CHECKS (parallel)
-  # ════════════════════════════════════════════════════════════════════════════
-
   check:
-    name: Check (${{ matrix.rust }} / ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Check ({% raw %}${{ matrix.rust }}{% endraw %} / {% raw %}${{ matrix.os }}{% endraw %})
+    runs-on: {% raw %}${{ matrix.os }}{% endraw %}
     strategy:
       fail-fast: false
       matrix:
         include:
-          # MSRV
-          - rust: "1.92"
+          - rust: "1.85"
             os: ubuntu-latest
             msrv: true
-          # Stable (primary)
           - rust: stable
             os: ubuntu-latest
-          # Stable on macOS
           - rust: stable
             os: macos-latest
-          # Stable on Windows
           - rust: stable
             os: windows-latest
-          # Nightly (for future compat)
           - rust: nightly
             os: ubuntu-latest
             allow_fail: true
-    continue-on-error: ${{ matrix.allow_fail || false }}
+    continue-on-error: {% raw %}${{ matrix.allow_fail || false }}{% endraw %}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - name: Install Rust ${{ matrix.rust }}
+      - name: Install Rust {% raw %}${{ matrix.rust }}{% endraw %}
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{ matrix.rust }}
+          toolchain: {% raw %}${{ matrix.rust }}{% endraw %}
           components: clippy
 
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: ${{ matrix.rust }}-${{ matrix.os }}
-          save-if: ${{ github.ref == 'refs/heads/main' }}
+          shared-key: {% raw %}${{ matrix.rust }}-${{ matrix.os }}{% endraw %}
+          save-if: {% raw %}${{ github.ref == 'refs/heads/main' }}{% endraw %}
 
-      - name: Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
-
-      - name: Check (all features)
-        run: cargo check --all-features
-
-      - name: Check (no default features)
-        run: cargo check --no-default-features
+      - run: cargo clippy --all-targets --all-features -- -D warnings
+      - run: cargo check --all-features
+      - run: cargo check --no-default-features
 
   fmt:
     name: Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust nightly
-        uses: dtolnay/rust-toolchain@nightly
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
-
-      - name: Check formatting
-        run: cargo +nightly fmt --all -- --check
+      - run: cargo +nightly fmt --all -- --check
 
   docs:
     name: Documentation
@@ -109,384 +88,158 @@ jobs:
     env:
       RUSTDOCFLAGS: -D warnings
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build docs
-        run: cargo doc --all-features --no-deps
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo doc --all-features --no-deps
 
   security:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install cargo-deny
-        uses: taiki-e/install-action@v2
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
         with:
           tool: cargo-deny
-
-      - name: Security audit
-        run: cargo deny check advisories
+      - run: cargo deny check advisories
 
   reuse:
     name: REUSE Compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Install reuse
-        run: pip install --user reuse
-
-      - name: Check REUSE compliance
-        run: reuse lint
-
-  # ════════════════════════════════════════════════════════════════════════════
-  # STAGE 2: TEST (after checks pass)
-  # ════════════════════════════════════════════════════════════════════════════
+      - uses: actions/checkout@v4
+      - run: pip install --user reuse
+      - run: reuse lint
 
   test:
     name: Test Suite
     needs: [check, fmt, security, reuse]
-    if: ${{ !inputs.skip_tests }}
+    if: {% raw %}${{ !inputs.skip_tests }}{% endraw %}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-        continue-on-error: true
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
         with:
           shared-key: test
-          save-if: ${{ github.ref == 'refs/heads/main' }}
-
-      - name: Install nextest
-        uses: taiki-e/install-action@v2
+          save-if: {% raw %}${{ github.ref == 'refs/heads/main' }}{% endraw %}
+      - uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
-
-      - name: Run tests
-        run: cargo nextest run --all-features --profile ci --no-tests=pass
-
-      - name: Run doctests
-        run: cargo test --doc --all-features || true
-
-      - name: Upload test results
+      - run: cargo nextest run --all-features --profile ci
+      - run: cargo test --doc --all-features
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v6
         with:
           name: test-results
           path: target/nextest/ci/junit.xml
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: target/nextest/ci/junit.xml
-          report_type: test_results
-          fail_ci_if_error: false
-
   coverage:
     name: Coverage
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools-preview
-
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-        continue-on-error: true
+      - uses: Swatinem/rust-cache@v2
         with:
           shared-key: coverage
-          save-if: ${{ github.ref == 'refs/heads/main' }}
-
-      - name: Install tools
-        uses: taiki-e/install-action@v2
+          save-if: {% raw %}${{ github.ref == 'refs/heads/main' }}{% endraw %}
+      - uses: taiki-e/install-action@v2
         with:
           tool: cargo-llvm-cov,cargo-nextest
-
-      - name: Generate coverage
-        run: |
-          cargo llvm-cov nextest --all-features --profile ci --lcov --output-path lcov.info
-          cargo llvm-cov report --html
-
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v5
+      - run: cargo llvm-cov nextest --all-features --profile ci --lcov --output-path lcov.info
+      - uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
           files: lcov.info
           fail_ci_if_error: false
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v6
-        with:
-          name: coverage-report
-          path: target/llvm-cov/html/
-          retention-days: 30
-
-      - name: Coverage summary
-        run: |
-          COVERAGE=$(cargo llvm-cov report 2>/dev/null | grep TOTAL | awk '{print $NF}' || echo "N/A")
-          echo "## Coverage: $COVERAGE" >> $GITHUB_STEP_SUMMARY
-
-  # ════════════════════════════════════════════════════════════════════════════
-  # STAGE 3: RELEASE (after tests pass, main branch only)
-  # ════════════════════════════════════════════════════════════════════════════
 
   changelog:
     name: Update Changelog
     needs: [check, fmt, security, reuse]
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      github.ref == 'refs/heads/main' &&
-      !contains(github.event.head_commit.message || '', '[skip ci]')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: Install git-cliff
-        uses: taiki-e/install-action@v2
+          token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+      - uses: taiki-e/install-action@v2
         with:
           tool: git-cliff
-
       - name: Generate changelog
         id: changelog
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -euo pipefail
-
-          if ! git cliff --config cliff.toml --github-token "$GITHUB_TOKEN" -o CHANGELOG.md 2>/dev/null; then
-            echo "::warning::GitHub API unavailable, generating without contributors"
-            git cliff --config cliff.toml -o CHANGELOG.md
-          fi
-
-          if git diff --quiet CHANGELOG.md 2>/dev/null; then
+          git cliff --config cliff.toml -o CHANGELOG.md
+          if git diff --quiet CHANGELOG.md; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-
       - name: Commit changelog
         if: steps.changelog.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          for i in 1 2 3; do
-            git add CHANGELOG.md
-            git diff --cached --quiet && { echo "No changes to commit"; exit 0; }
-            git commit -m "chore: update CHANGELOG.md [skip ci]" || true
-
-            if git push origin main 2>&1; then
-              echo "Push successful"
-              exit 0
-            fi
-
-            echo "Push failed, retrying..."
-            git fetch origin main
-            git reset --hard origin/main
-            git cliff --config cliff.toml -o CHANGELOG.md
-            sleep $((i * 2))
-          done
-
-          echo "::warning::Failed to push changelog after 3 attempts"
-          exit 0
+          git add CHANGELOG.md
+          git commit -m "chore: update CHANGELOG [skip ci]"
+          git push
 
   release:
     name: Release
-    needs: [check, fmt, docs, security, reuse, test, coverage, changelog]
-    if: |
-      always() &&
-      needs.check.result == 'success' &&
-      needs.fmt.result == 'success' &&
-      needs.docs.result == 'success' &&
-      needs.security.result == 'success' &&
-      needs.reuse.result == 'success' &&
-      (needs.test.result == 'success' || needs.test.result == 'skipped') &&
-      (needs.coverage.result == 'success' || needs.coverage.result == 'skipped') &&
-      needs.changelog.result == 'success' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      github.ref == 'refs/heads/main' &&
-      !contains(github.event.head_commit.message || '', '[skip ci]')
+    needs: [check, fmt, docs, security, reuse, test, coverage]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    outputs:
-      published: ${{ steps.publish.outputs.published }}
-      version: ${{ steps.publish.outputs.version }}
-      tag: ${{ steps.publish.outputs.tag }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Detect version
+      - name: Get version
         id: version
         run: |
           VERSION=$(cargo metadata --format-version=1 --no-deps | jq -r '.packages[0].version')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Detected version: $VERSION"
 
-      - name: Check if already published
+      - name: Check if published
         id: check
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          CRATE_NAME=$(cargo metadata --format-version=1 --no-deps | jq -r '.packages[0].name')
-          # Check crates.io API directly for more reliable results
-          if curl -s "https://crates.io/api/v1/crates/$CRATE_NAME/$VERSION" | jq -e '.version' >/dev/null 2>&1; then
-            echo "already_published=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::Version $VERSION already exists on crates.io"
-          else
-            echo "already_published=false" >> "$GITHUB_OUTPUT"
-            echo "Version $VERSION not yet published"
-          fi
-
-      - name: Version already published
-        if: steps.check.outputs.already_published == 'true' && !inputs.force_publish
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          CRATE_NAME=$(cargo metadata --format-version=1 --no-deps | jq -r '.packages[0].name')
-          echo "## ℹ️ Version $VERSION already published" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "This version is already available on [crates.io](https://crates.io/crates/$CRATE_NAME/$VERSION)." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### To publish a new version:" >> $GITHUB_STEP_SUMMARY
-          echo "1. Update \`version\` in \`Cargo.toml\`" >> $GITHUB_STEP_SUMMARY
-          echo "2. Follow [SemVer](https://semver.org/) rules:" >> $GITHUB_STEP_SUMMARY
-          echo "   - **MAJOR** (x.0.0): Breaking API changes" >> $GITHUB_STEP_SUMMARY
-          echo "   - **MINOR** (0.x.0): New features, backwards compatible" >> $GITHUB_STEP_SUMMARY
-          echo "   - **PATCH** (0.0.x): Bug fixes, backwards compatible" >> $GITHUB_STEP_SUMMARY
-          echo "3. Commit and push to trigger a new release" >> $GITHUB_STEP_SUMMARY
-
-      - name: Publish to crates.io
-        id: publish
-        if: steps.check.outputs.already_published == 'false' || inputs.force_publish
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          TAG="${{ steps.version.outputs.tag }}"
-          CRATE_NAME=$(cargo metadata --format-version=1 --no-deps | jq -r '.packages[0].name')
-
-          echo "Publishing $CRATE_NAME $VERSION..."
-
-          if cargo publish --no-verify 2>&1 | tee /tmp/publish.log; then
-            echo "Successfully published $CRATE_NAME $VERSION"
+          CRATE=$(cargo metadata --format-version=1 --no-deps | jq -r '.packages[0].name')
+          VERSION="{% raw %}${{ steps.version.outputs.version }}{% endraw %}"
+          if curl -sf "https://crates.io/api/v1/crates/$CRATE/$VERSION" > /dev/null; then
             echo "published=true" >> "$GITHUB_OUTPUT"
-            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           else
-            if grep -q "already exists" /tmp/publish.log; then
-              echo "::notice::Version $VERSION already exists on crates.io"
-              echo "published=false" >> "$GITHUB_OUTPUT"
-            else
-              echo "::error::Failed to publish"
-              cat /tmp/publish.log
-              exit 1
-            fi
+            echo "published=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install git-cliff
-        if: steps.publish.outputs.published == 'true'
-        uses: taiki-e/install-action@v2
-        with:
-          tool: git-cliff
+      - name: Publish
+        if: steps.check.outputs.published == 'false'
+        env:
+          CARGO_REGISTRY_TOKEN: {% raw %}${{ secrets.CARGO_REGISTRY_TOKEN }}{% endraw %}
+        run: cargo publish
 
-      - name: Generate release notes
-        id: notes
-        if: steps.publish.outputs.published == 'true'
+      - name: Create tag
+        if: steps.check.outputs.published == 'false'
         run: |
-          TAG="${{ steps.version.outputs.tag }}"
-
-          # Fetch all tags for accurate comparison
-          git fetch --tags --force
-
-          # Generate notes BEFORE tag is created
-          NOTES=$(git cliff --config cliff.toml \
-            --unreleased \
-            --strip header \
-            --tag "$TAG" \
-            2>/dev/null || echo "")
-
-          # Fallback
-          if [ -z "$NOTES" ]; then
-            NOTES="Release ${{ steps.version.outputs.version }}"
-          fi
-
-          # Save to file (multiline output)
-          echo "$NOTES" > /tmp/release_notes.md
-
-      - name: Create git tag
-        if: steps.publish.outputs.published == 'true'
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
-
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists"
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git tag -a "$TAG" -m "Release $TAG"
-            git push origin "$TAG"
-            echo "Created tag $TAG"
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "{% raw %}${{ steps.version.outputs.tag }}{% endraw %}" -m "Release {% raw %}${{ steps.version.outputs.tag }}{% endraw %}"
+          git push origin "{% raw %}${{ steps.version.outputs.tag }}{% endraw %}"
 
       - name: Create GitHub Release
-        if: steps.publish.outputs.published == 'true'
+        if: steps.check.outputs.published == 'false'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
         run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          VERSION="${{ steps.version.outputs.version }}"
-
-          # Create release with pre-generated notes
-          gh release create "$TAG" \
-            --title "Release $VERSION" \
-            --notes-file /tmp/release_notes.md \
-            --verify-tag || echo "Release already exists or creation failed"
-
-      - name: Summary
-        if: always()
-        run: |
-          CRATE_NAME=$(cargo metadata --format-version=1 --no-deps | jq -r '.packages[0].name')
-          echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.publish.outputs.published }}" == "true" ]; then
-            echo "Published **$CRATE_NAME ${{ steps.version.outputs.version }}**" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [crates.io](https://crates.io/crates/$CRATE_NAME/${{ steps.version.outputs.version }})" >> $GITHUB_STEP_SUMMARY
-            echo "- [docs.rs](https://docs.rs/$CRATE_NAME/${{ steps.version.outputs.version }})" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ steps.check.outputs.already_published }}" == "true" ]; then
-            echo "Version ${{ steps.version.outputs.version }} already published" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No release triggered" >> $GITHUB_STEP_SUMMARY
-          fi
+          gh release create "{% raw %}${{ steps.version.outputs.tag }}{% endraw %}" \
+            --title "Release {% raw %}${{ steps.version.outputs.version }}{% endraw %}" \
+            --generate-notes

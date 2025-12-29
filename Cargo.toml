@@ -1,21 +1,21 @@
-# SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+# SPDX-FileCopyrightText: 2025 {{author_name}} <{{author_email}}>
 #
 # SPDX-License-Identifier: MIT
 
 [package]
-name = "{{crate_name}}"
+name = "{{project-name}}"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.92"
-authors = ["Your Name <your@email.com>"]
-description = "A short description of the crate"
-documentation = "https://docs.rs/{{crate_name}}"
+rust-version = "1.85"
+authors = ["{{author_name}} <{{author_email}}>"]
+description = "{{description}}"
+documentation = "https://docs.rs/{{project-name}}"
 readme = "README.md"
-homepage = "https://github.com/{{github_username}}/{{crate_name}}"
-repository = "https://github.com/{{github_username}}/{{crate_name}}"
+homepage = "https://github.com/{{gh_username}}/{{project-name}}"
+repository = "https://github.com/{{gh_username}}/{{project-name}}"
 license = "MIT"
-keywords = ["keyword1", "keyword2"]
-categories = ["development-tools"]
+keywords = []
+categories = []
 include = ["src/**/*", "Cargo.toml", "LICENSE", "README.md", "CHANGELOG.md"]
 
 [lib]
@@ -25,9 +25,6 @@ path = "src/lib.rs"
 [dependencies]
 
 [dev-dependencies]
-
-[features]
-default = []
 
 [lints.rust]
 unsafe_code = "forbid"

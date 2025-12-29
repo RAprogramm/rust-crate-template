@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
+[template]
+cargo_generate_version = ">=0.21.0"
+ignore = [".git", "template-test.yml"]
+exclude = [".github/workflows/template-test.yml"]
+
+[placeholders.gh_username]
+type = "string"
+prompt = "GitHub username?"
+
+[placeholders.author_name]
+type = "string"
+prompt = "Author name?"
+
+[placeholders.author_email]
+type = "string"
+prompt = "Author email?"
+
+[placeholders.description]
+type = "string"
+prompt = "Short crate description?"

@@ -1,32 +1,36 @@
-// SPDX-FileCopyrightText: 2025 RAprogramm <andrey.rozanov.vl@gmail.com>
+// SPDX-FileCopyrightText: 2025 {{author_name}} <{{author_email}}>
 //
 // SPDX-License-Identifier: MIT
 
-//! # {{crate_name}}
+//! # {{project-name}}
 //!
-//! A short description of what this crate does.
+//! {{description}}
 //!
-//! ## Example
+//! ## Quick Start
 //!
 //! ```rust
-//! use {{crate_name}}::hello;
+//! use {{crate_name}}::greet;
 //!
-//! let message = hello();
-//! assert_eq!(message, "Hello, world!");
+//! let message = greet("World");
+//! assert_eq!(message, "Hello, World!");
 //! ```
 
 /// Returns a greeting message.
 ///
+/// # Arguments
+///
+/// * `name` - The name to greet
+///
 /// # Example
 ///
 /// ```rust
-/// use {{crate_name}}::hello;
+/// use {{crate_name}}::greet;
 ///
-/// assert_eq!(hello(), "Hello, world!");
+/// assert_eq!(greet("Rust"), "Hello, Rust!");
 /// ```
 #[must_use]
-pub fn hello() -> &'static str {
-    "Hello, world!"
+pub fn greet(name: &str) -> String {
+    format!("Hello, {name}!")
 }
 
 #[cfg(test)]
@@ -34,7 +38,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_hello() {
-        assert_eq!(hello(), "Hello, world!");
+    fn test_greet() {
+        assert_eq!(greet("World"), "Hello, World!");
+    }
+
+    #[test]
+    fn test_greet_empty() {
+        assert_eq!(greet(""), "Hello, !");
     }
 }
